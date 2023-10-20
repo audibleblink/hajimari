@@ -88,6 +88,7 @@
     const handleSubmit = () => {
         query = query.replaceAll("+", "%2B");
 
+        // do search with disgnated provider
         let matches = query.match(/@(\w+)\s?(.*)/);
         if (matches) {
             let token = matches[1];
@@ -104,19 +105,24 @@
             } else if (provider) {
                 window.location.assign(provider.url);
             }
-        } else if (validURL(query)) {
+        } 
+
+        // go to url
+        if (validURL(query)) {
             if (containsProtocol(query)) {
                 window.location.assign(query);
             } else {
                 window.location.assign("https://" + query);
             }
-        } else {
-            let provider = defaultProviderRecord;
-            if (provider?.searchUrl) {
-                window.location.assign(
-                    provider.searchUrl.replaceAll("{query}", query)
-                );
-            }
+        } 
+
+
+        // default search
+        let provider = defaultProviderRecord;
+        if (provider?.searchUrl) {
+            window.location.assign(
+                provider.searchUrl.replaceAll("{query}", query)
+            );
         }
     };
 
@@ -150,7 +156,7 @@
             id="keywords"
             size="50"
             spellcheck="false"
-            autofocus={true}
+            autofocus
         />
     </form>
 </section>
