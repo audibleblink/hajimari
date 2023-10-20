@@ -7,7 +7,6 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/toboshii/hajimari/internal/config"
-	"github.com/toboshii/hajimari/internal/hajimari/crdapps"
 	"github.com/toboshii/hajimari/internal/hajimari/ingressapps"
 	"github.com/toboshii/hajimari/internal/kube"
 	"github.com/toboshii/hajimari/internal/kube/util"
@@ -54,7 +53,6 @@ func getKubeApps() []models.AppGroup {
 	}
 
 	kubeClient := kube.GetClient()
-	dynClient := kube.GetDynamicClient()
 
 	namespaces, err := util.PopulateNamespaceList(kubeClient, appConfig.NamespaceSelector)
 	if err != nil {
@@ -81,20 +79,6 @@ func getKubeApps() []models.AppGroup {
 		logger.Error("An error occurred while looking for hajimari Ingress apps", err)
 		return nil
 	}
-
-	// Collect Custom Resource apps
-
-	crdAppsList := crdapps.NewList(dynClient, *appConfig)
-
-	crdApps, err := crdAppsList.Populate(namespaces...).Get()
-	if err != nil {
-		logger.Error("An error occurred while looking for hajimari Custom Resource apps", err)
-		return nil
-	}
-
-	// Merge together
-
-	ingressApps = append(ingressApps, crdApps...)
 
 	return ingressApps
 }
